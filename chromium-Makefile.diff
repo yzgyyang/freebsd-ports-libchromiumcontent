@@ -1,0 +1,25 @@
+--- a/Makefile   2017-12-05 00:12:27.457897000 -0500
++++ b/Makefile   2017-12-05 00:12:57.609017000 -0500
+@@ -200,11 +200,6 @@
+ # TODO: move this big extra to small ones
+ EXTRA_PATCHES+=        ${FILESDIR}/extra-patch-clang
+
+-# Work around base r261801
+-.if ${OPSYS} == FreeBSD && ${OSVERSION} < 1100508
+-GN_ARGS+=      extra_cxxflags="-D_LIBCPP_TRIVIAL_PAIR_COPY_CTOR=1"
+-.endif
+-
+ pre-everything::
+        @${ECHO_MSG}
+        @${ECHO_MSG} "To build Chromium, you should have around 2GB of memory,"
+--- a/Makefile   2017-12-05 00:15:32.341654000 -0500
++++ b/Makefile   2017-12-05 00:16:27.215541000 -0500
+@@ -60,7 +60,7 @@
+                droid-fonts-ttf>0:x11-fonts/droid-fonts-ttf
+
+ ONLY_FOR_ARCHS=        i386 amd64
+-USES=          compiler bison cpe desktop-file-utils execinfo jpeg \
++USES=          compiler bison cpe desktop-file-utils jpeg \
+                ninja perl5 pkgconfig python:2,build shebangfix tar:xz
+
+ CPE_VENDOR=    google
