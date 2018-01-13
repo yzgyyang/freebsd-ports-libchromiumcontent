@@ -1,3 +1,5 @@
-TIMESTAMP = 1515471919
-SHA256 (electron-libchromiumcontent--e301597_GH0.tar.gz) = a6866b9de338384455ab4242ce828a3040247570214efbb4588df8c26f588fb3
-SIZE (electron-libchromiumcontent--e301597_GH0.tar.gz) = 65960
+TIMESTAMP = 1515787534
+SHA256 (electron-libchromiumcontent--electron-1-6-x_GH0.tar.gz) = 0460cd124ea06b805cebfb9dcc9259e97759c5e3684050df1131693e391bd254
+SIZE (electron-libchromiumcontent--electron-1-6-x_GH0.tar.gz) = 430521
+SHA256 (svn2github-python-patch-a336a45_GH0.tar.gz) = b26884c1a170adddd574495b423b59c4062249bc1ae9f741cf52c059db2e19e5
+SIZE (svn2github-python-patch-a336a45_GH0.tar.gz) = 239587

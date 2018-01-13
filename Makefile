@@ -9,23 +9,35 @@ MAINTAINER=	ygy@FreeBSD.org
 USE_GITHUB=	yes
 GH_ACCOUNT=	electron
 GH_PROJECT=	libchromiumcontent
-GH_TAGNAME=	e301597
+GH_TAGNAME=	electron-1-6-x
+GH_TUPLE=	svn2github:python-patch:a336a45:pythonpatch/vendor/python-patch
 
 pre-build:
-	svnlite co -r442282 svn://svn.freebsd.org/ports/head/www/chromium ${WRKSRC}/chromium
-	rm ${WRKSRC}/chromium/files/patch-gpu_command__buffer_service_program__manager.cc
-	rm ${WRKSRC}/chromium/files/patch-gpu_config_gpu__control__list.cc
-	rm ${WRKSRC}/chromium/files/patch-third__party_leveldatabase_env__chromium.cc
-	patch -p1 --ignore-whitespace -d ${WRKSRC}/chromium/ < chromium-Makefile.diff
+	svnlite co -r435428 svn://svn.freebsd.org/ports/head/www/chromium ${WRKSRC}/chromium
+	patch -p1 -d ${WRKSRC}/chromium/ < chromium_make.diff
+	rm ${WRKSRC}/chromium/files/patch-third__party_ffmpeg_ffmpeg__generated.gni.orig
 	cd ${WRKSRC}/chromium && make configure DISABLE_VULNERABILITIES=yes
+	patch -p1 -d ${WRKSRC} < libchromiumcontent.diff
 	${WRKSRC}/script/bootstrap
-	mv ${WRKSRC}/chromium/work/chromium-58.0.3029.110 ${WRKSRC}/src
-	mv ${WRKSRC}/src/third_party/ffmpeg/BUILD.gn.orig ${WRKSRC}/src/third_party/ffmpeg/BUILD.gn
-	patch -p1 --ignore-whitespace -d ${WRKSRC}/src/ < chromiumv1.diff
+	mv ${WRKSRC}/chromium/work/chromium-56.0.2924.87 ${WRKSRC}/src
+	patch -p1 -d ${WRKSRC}/src/third_party/ffmpeg/ < ${WRKSRC}/patches/third_party/ffmpeg/build_gn.patch
+	patch -p1 -d ${WRKSRC}/src/third_party/icu/ < ${WRKSRC}/patches/third_party/icu/build_gn.patch
+	patch -p1 -d ${WRKSRC}/src/v8/ < ${WRKSRC}/patches/v8/build_gn.patch
+	patch -p1 -d ${WRKSRC}/src/ < ${WRKSRC}/patches/build_gn.patch
+	rm ${WRKSRC}/patches/third_party/ffmpeg/build_gn.patch
+	rm ${WRKSRC}/patches/third_party/icu/build_gn.patch
+	rm ${WRKSRC}/patches/v8/build_gn.patch
+	rm ${WRKSRC}/patches/build_gn.patch
+	rm ${WRKSRC}/src/base/process/launch.h.orig
+	rm ${WRKSRC}/src/content/browser/renderer_host/*.orig
+	rm ${WRKSRC}/src/chrome/browser/ui/libgtkui/*.orig
+	rm ${WRKSRC}/src/content/app/*.orig
+	rm ${WRKSRC}/src/content/renderer/*.orig
+	patch -p1 --ignore-whitespace -d ${WRKSRC}/src/ < chromiumv2.diff
 
 do-build:
 	${WRKSRC}/script/update -t x64
-	${WRKSRC}/build --no_shared_library -t x64
-	${WRKSRC}/create-dist -c static_library -t x64
+	${WRKSRC}/script/build --no_shared_library -t x64
+	${WRKSRC}/script/create-dist -c static_library -t x64
 
 .include <bsd.port.mk>
