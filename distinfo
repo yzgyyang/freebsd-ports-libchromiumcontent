@@ -1,5 +1,7 @@
-TIMESTAMP = 1515787534
-SHA256 (electron-libchromiumcontent--electron-1-6-x_GH0.tar.gz) = 0460cd124ea06b805cebfb9dcc9259e97759c5e3684050df1131693e391bd254
-SIZE (electron-libchromiumcontent--electron-1-6-x_GH0.tar.gz) = 430521
-SHA256 (svn2github-python-patch-a336a45_GH0.tar.gz) = b26884c1a170adddd574495b423b59c4062249bc1ae9f741cf52c059db2e19e5
-SIZE (svn2github-python-patch-a336a45_GH0.tar.gz) = 239587
+TIMESTAMP = 1516907720
+SHA256 (electron-libchromiumcontent-1.0-2bdad00587_GH0.tar.gz) = 7978901c2236b6fbc913d8a69f295d565800391d5899ab71ed71b92fc496ef49
+SIZE (electron-libchromiumcontent-1.0-2bdad00587_GH0.tar.gz) = 127359
+SHA256 (piotrbulinski-boto-c3b81eb_GH0.tar.gz) = c64c0ff48c87d9a70d63a2345a04de3e3f6756324bc0578c6d423fde8370dd41
+SIZE (piotrbulinski-boto-c3b81eb_GH0.tar.gz) = 1349165
+SHA256 (yzgyyang-depot-tools-c55eecf_GH0.tar.gz) = 0e6b4f78604a0ecaac817a4c091f2272e0f9342ed72ae97ad57ced0bc572fd60
+SIZE (yzgyyang-depot-tools-c55eecf_GH0.tar.gz) = 2710403

@@ -1,62 +1,28 @@
---- a/files/patch-third__party_ffmpeg_ffmpeg__generated.gni	2017-12-07 09:29:02.987115000 +0400
-+++ b/files/patch-third__party_ffmpeg_ffmpeg__generated.gni	2017-12-07 09:29:52.859699000 +0400
-@@ -23,7 +23,7 @@
-  }
-  
- -if ((current_cpu == "x64" && ffmpeg_branding == "Chrome") || (is_android && current_cpu == "arm" && arm_use_neon && ffmpeg_branding == "Chrome") || (is_android && current_cpu == "arm64" && ffmpeg_branding == "Chrome") || (is_android && current_cpu == "mips64el" && ffmpeg_branding == "Chrome") || (is_android && current_cpu == "mipsel" && ffmpeg_branding == "Chrome") || (is_android && current_cpu == "x86" && ffmpeg_branding == "Chrome") || (is_linux && current_cpu == "arm" && arm_use_neon && ffmpeg_branding == "Chrome") || (is_linux && current_cpu == "arm" && arm_use_neon && ffmpeg_branding == "ChromeOS") || (is_linux && current_cpu == "arm" && ffmpeg_branding == "Chrome") || (is_linux && current_cpu == "arm" && ffmpeg_branding == "ChromeOS") || (is_linux && current_cpu == "arm64" && ffmpeg_branding == "Chrome") || (is_linux && current_cpu == "arm64" && ffmpeg_branding == "ChromeOS") || (is_linux && current_cpu == "mipsel" && ffmpeg_branding == "Chrome") || (is_linux && current_cpu == "mipsel" && ffmpeg_branding == "ChromeOS") || (is_linux && current_cpu == "x64" && ffmpeg_branding == "ChromeOS") || (is_linux && current_cpu == "x86" && ffmpeg_branding == "Chrome") || (is_linux && current_cpu == "x86" && ffmpeg_branding == "ChromeOS") || (is_win && ffmpeg_branding == "Chrome")) {
--+if ((current_cpu == "x64" && ffmpeg_branding == "Chrome") || (is_android && current_cpu == "arm" && arm_use_neon && ffmpeg_branding == "Chrome") || (is_android && current_cpu == "arm64" && ffmpeg_branding == "Chrome") || (is_android && current_cpu == "mips64el" && ffmpeg_branding == "Chrome") || (is_android && current_cpu == "mipsel" && ffmpeg_branding == "Chrome") || (is_android && current_cpu == "x86" && ffmpeg_branding == "Chrome") || ((is_linux || is_bsd) && current_cpu == "arm" && arm_use_neon && ffmpeg_branding == "Chrome") || ((is_linux || is_bsd) && current_cpu == "arm" && arm_use_neon && ffmpeg_branding == "ChromeOS") || ((is_linux || is_bsd) && current_cpu == "arm" && ffmpeg_branding == "Chrome") || ((is_linux || is_bsd) && current_cpu == "arm" && ffmpeg_branding == "ChromeOS") || ((is_linux || is_bsd) && current_cpu == "arm64" && ffmpeg_branding == "Chrome") || ((is_linux || is_bsd) && current_cpu == "arm64" && ffmpeg_branding == "ChromeOS") || ((is_linux || is_bsd) && current_cpu == "mipsel" && ffmpeg_branding == "Chrome") || ((is_linux || is_bsd) && current_cpu == "mipsel" && ffmpeg_branding == "ChromeOS") || ((is_linux || is_bsd) && current_cpu == "x64" && ffmpeg_branding == "ChromeOS") || ((is_linux | is_bsd) && current_cpu == "x86" && ffmpeg_branding == "Chrome") || ((is_linux || is_bsd) && current_cpu == "x86" && ffmpeg_branding == "ChromeOS") || (is_win && ffmpeg_branding == "Chrome")) {
-++if ((current_cpu == "x64" && ffmpeg_branding == "Chrome") || (is_android && current_cpu == "arm" && arm_use_neon && ffmpeg_branding == "Chrome") || (is_android && current_cpu == "arm64" && ffmpeg_branding == "Chrome") || (is_android && current_cpu == "mips64el" && ffmpeg_branding == "Chrome") || (is_android && current_cpu == "mipsel" && ffmpeg_branding == "Chrome") || (is_android && current_cpu == "x86" && ffmpeg_branding == "Chrome") || ((is_linux || is_bsd) && current_cpu == "arm" && arm_use_neon && ffmpeg_branding == "Chrome") || ((is_linux || is_bsd) && current_cpu == "arm" && arm_use_neon && ffmpeg_branding == "ChromeOS") || ((is_linux || is_bsd) && current_cpu == "arm" && ffmpeg_branding == "Chrome") || ((is_linux || is_bsd) && current_cpu == "arm" && ffmpeg_branding == "ChromeOS") || ((is_linux || is_bsd) && current_cpu == "arm64" && ffmpeg_branding == "Chrome") || ((is_linux || is_bsd) && current_cpu == "arm64" && ffmpeg_branding == "ChromeOS") || ((is_linux || is_bsd) && current_cpu == "mipsel" && ffmpeg_branding == "Chrome") || ((is_linux || is_bsd) && current_cpu == "mipsel" && ffmpeg_branding == "ChromeOS") || ((is_linux || is_bsd) && current_cpu == "x64" && ffmpeg_branding == "ChromeOS") || ((is_linux || is_bsd) && current_cpu == "x86" && ffmpeg_branding == "Chrome") || ((is_linux || is_bsd) && current_cpu == "x86" && ffmpeg_branding == "ChromeOS") || (is_win && ffmpeg_branding == "Chrome")) {
-    ffmpeg_c_sources += [
-      "libavcodec/aac_ac3_parser.c",
-      "libavcodec/aac_parser.c",
---- a/Makefile	2017-12-07 09:26:24.600675000 +0400
-+++ b/Makefile	2017-12-07 09:27:50.794244000 +0400
-@@ -15,10 +15,9 @@
- LICENSE_COMB=	multi
- 
- BUILD_DEPENDS=	gperf:devel/gperf \
--		clang39:devel/llvm39 \
-+		clang40:devel/llvm40 \
+--- a/Makefile	2018-01-18 19:54:48.014513000 +0400
++++ b/Makefile	2018-01-18 19:56:22.742990000 +0400
+@@ -23,7 +23,6 @@
+ BUILD_DEPENDS+=	gperf:devel/gperf \
+ 		clang40:devel/llvm40 \
  		yasm:devel/yasm \
- 		python:lang/python \
 -		ffmpeg>=3.2.2,1:multimedia/ffmpeg \
- 		bash:shells/bash \
  		flock:sysutils/flock \
+ 		node:www/node \
  		${LOCALBASE}/include/linux/videodev2.h:multimedia/v4l_compat \
-@@ -43,7 +42,6 @@
+@@ -47,8 +46,6 @@
+ 		libdrm.so:graphics/libdrm \
  		libexif.so:graphics/libexif \
  		libpng.so:graphics/png \
- 		libwebp.so:graphics/webp \
+-		libwebp.so:graphics/webp \
 -		libavcodec.so:multimedia/ffmpeg \
  		libcups.so:print/cups \
- 		libfreetype.so:print/freetype2 \
  		libharfbuzz.so:print/harfbuzz \
-@@ -58,7 +56,7 @@
- 		droid-fonts-ttf>0:x11-fonts/droid-fonts-ttf
- 
- ONLY_FOR_ARCHS=	i386 amd64
--USES=		compiler bison cpe desktop-file-utils execinfo jpeg \
-+USES=		compiler bison cpe desktop-file-utils jpeg \
- 		ninja perl5 pkgconfig python:2,build shebangfix tar:xz
- 
- CPE_VENDOR=	google
-@@ -185,8 +183,8 @@
- 
- .include <bsd.port.pre.mk>
- 
--CC=		clang39
--CXX=		clang++39
-+CC=		clang40
-+CXX=		clang++40
- #optionally set AR, LD, NM, READELF ?
- 
- # TODO: -isystem, would be just as ugly as this approach, but more reliably
-@@ -229,7 +227,7 @@
+ 		libharfbuzz-icu.so:print/harfbuzz-icu \
+@@ -233,7 +230,7 @@
  	#./build/linux/unbundle/remove_bundled_libraries.py [list of preserved]
  	cd ${WRKSRC} && ${PYTHON_CMD} \
  		./build/linux/unbundle/replace_gn_files.py --system-libraries \
 -		ffmpeg flac harfbuzz-ng libwebp libxml libxslt snappy yasm || ${FALSE}
-+		flac harfbuzz-ng libwebp libxml libxslt snappy yasm || ${FALSE}
++		 flac harfbuzz-ng libxml libxslt snappy yasm || ${FALSE}
+ .endif
  
  do-configure:
- 	# GN generator bootstrapping and generating ninja files
