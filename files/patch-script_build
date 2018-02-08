@@ -1,0 +1,22 @@
+--- script/build.orig	2018-01-08 01:30:08 UTC
++++ script/build
+@@ -23,15 +23,16 @@ if sys.platform == 'win32':
+   NINJA = '{0}.exe'.format(NINJA)
+ elif IS_MIPS64EL_HOST:
+   NINJA = os.path.join(VENDOR_DIR, 'depot_tools', 'ninja-build')
+-
++elif sys.platform == 'freebsd11':
++  NINJA = 'ninja'
+ 
+ def main():
+   args = parse_args()
+   target_arch = args.target_arch
+ 
+   env = os.environ.copy()
+-  env['PATH'] = os.pathsep.join([os.path.join(VENDOR_DIR, 'depot_tools'),
+-                                 env['PATH']])
++  #env['PATH'] = os.pathsep.join([os.path.join(VENDOR_DIR, 'depot_tools'),
++  #                               env['PATH']])
+   if sys.platform in ['win32', 'cygwin']:
+     env['DEPOT_TOOLS_WIN_TOOLCHAIN'] = '0'
+   elif target_arch == 'arm64':

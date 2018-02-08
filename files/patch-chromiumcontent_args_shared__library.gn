@@ -1,0 +1,34 @@
+--- chromiumcontent/args/shared_library.gn.orig	2018-01-08 01:30:08 UTC
++++ chromiumcontent/args/shared_library.gn
+@@ -50,3 +50,31 @@ if (target_cpu == "mips64el") {
+     use_sysroot = false
+   }
+ }
++
++if (target_os == "bsd") {
++  clang_use_chrome_plugins=false                                          
++  enable_nacl=false                                                       
++  enable_one_click_signin=true                                            
++  enable_remoting=false                                                   
++  enable_webrtc=false                                                     
++  fieldtrial_testing_like_official_build=true                             
++  is_clang=true                                                           
++  toolkit_views=true                                                      
++  use_gtk3=true                                                           
++  use_lld=true                                                            
++  use_sysroot=false                                                       
++  use_system_libjpeg=true                                                 
++  use_system_sqlite=false                                                 
++  ffmpeg_branding="Chrome"                                                
++  proprietary_codecs=true                                                 
++  enable_hevc_demuxing=true                                               
++  use_gconf=true                                                          
++  use_kerberos=true                                                       
++  use_alsa=true                                                           
++  use_pulseaudio=false                                                    
++  use_sndio=false                                                         
++  is_debug=false                                                          
++  symbol_level=0                                                          
++  remove_webcore_debug_symbols=true                                       
++  extra_cxxflags="-Wno-deprecated-register  -I/usr/local/include"
++}

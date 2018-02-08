@@ -1,0 +1,96 @@
+--- patches/v8/007-backport_f19b889.patch.orig	2018-01-08 01:30:08 UTC
++++ patches/v8/007-backport_f19b889.patch
+@@ -113,93 +113,3 @@ index 3effb39f7c..a7666dfd42 100644
+    void resetContextGroup(int contextGroupId) override;
+    void idleStarted() override;
+    void idleFinished() override;
+-diff --git a/test/inspector/inspector-test.cc b/test/inspector/inspector-test.cc
+-index 930d6c9477..767168b297 100644
+---- a/test/inspector/inspector-test.cc
+-+++ b/test/inspector/inspector-test.cc
+-@@ -642,6 +642,9 @@ class InspectorExtension : public IsolateData::SetupGlobalTask {
+-     inspector->Set(ToV8String(isolate, "fireContextDestroyed"),
+-                    v8::FunctionTemplate::New(
+-                        isolate, &InspectorExtension::FireContextDestroyed));
+-+    inspector->Set(
+-+        ToV8String(isolate, "freeContext"),
+-+        v8::FunctionTemplate::New(isolate, &InspectorExtension::FreeContext));
+-     inspector->Set(ToV8String(isolate, "addInspectedObject"),
+-                    v8::FunctionTemplate::New(
+-                        isolate, &InspectorExtension::AddInspectedObject));
+-@@ -683,6 +686,12 @@ class InspectorExtension : public IsolateData::SetupGlobalTask {
+-     data->FireContextDestroyed(context);
+-   }
+- 
+-+  static void FreeContext(const v8::FunctionCallbackInfo<v8::Value>& args) {
+-+    v8::Local<v8::Context> context = args.GetIsolate()->GetCurrentContext();
+-+    IsolateData* data = IsolateData::FromContext(context);
+-+    data->FreeContext(context);
+-+  }
+-+
+-   static void AddInspectedObject(
+-       const v8::FunctionCallbackInfo<v8::Value>& args) {
+-     if (args.Length() != 2 || !args[0]->IsInt32()) {
+-diff --git a/test/inspector/isolate-data.cc b/test/inspector/isolate-data.cc
+-index 74c367a5e9..bd97a927e8 100644
+---- a/test/inspector/isolate-data.cc
+-+++ b/test/inspector/isolate-data.cc
+-@@ -303,6 +303,13 @@ void IsolateData::FireContextDestroyed(v8::Local<v8::Context> context) {
+-   inspector_->contextDestroyed(context);
+- }
+- 
+-+void IsolateData::FreeContext(v8::Local<v8::Context> context) {
+-+  int context_group_id = GetContextGroupId(context);
+-+  auto it = contexts_.find(context_group_id);
+-+  if (it == contexts_.end()) return;
+-+  contexts_.erase(it);
+-+}
+-+
+- std::vector<int> IsolateData::GetSessionIds(int context_group_id) {
+-   std::vector<int> result;
+-   for (auto& it : sessions_) {
+-diff --git a/test/inspector/isolate-data.h b/test/inspector/isolate-data.h
+-index a94316ff9b..c96a8d1bbd 100644
+---- a/test/inspector/isolate-data.h
+-+++ b/test/inspector/isolate-data.h
+-@@ -68,6 +68,7 @@ class IsolateData : public v8_inspector::V8InspectorClient {
+-   void DumpAsyncTaskStacksStateForTest();
+-   void FireContextCreated(v8::Local<v8::Context> context, int context_group_id);
+-   void FireContextDestroyed(v8::Local<v8::Context> context);
+-+  void FreeContext(v8::Local<v8::Context> context);
+- 
+-  private:
+-   struct VectorCompare {
+-diff --git a/test/inspector/runtime/context-destroyed-on-context-collected-expected.txt b/test/inspector/runtime/context-destroyed-on-context-collected-expected.txt
+-new file mode 100644
+-index 0000000000..9a5e1708c1
+---- /dev/null
+-+++ b/test/inspector/runtime/context-destroyed-on-context-collected-expected.txt
+-@@ -0,0 +1,7 @@
+-+Tests that contextDesrtoyed nofitication is fired when context is collected.
+-+{
+-+    method : Runtime.executionContextDestroyed
+-+    params : {
+-+        executionContextId : <executionContextId>
+-+    }
+-+}
+-diff --git a/test/inspector/runtime/context-destroyed-on-context-collected.js b/test/inspector/runtime/context-destroyed-on-context-collected.js
+-new file mode 100644
+-index 0000000000..9f715937c6
+---- /dev/null
+-+++ b/test/inspector/runtime/context-destroyed-on-context-collected.js
+-@@ -0,0 +1,14 @@
+-+// Copyright 2017 the V8 project authors. All rights reserved.
+-+// Use of this source code is governed by a BSD-style license that can be
+-+// found in the LICENSE file.
+-+
+-+let {session, contextGroup, Protocol} =
+-+  InspectorTest.start('Tests that contextDesrtoyed nofitication is fired when context is collected.');
+-+
+-+(async function test() {
+-+  await Protocol.Runtime.enable();
+-+  Protocol.Runtime.onExecutionContextDestroyed(InspectorTest.logMessage);
+-+  contextGroup.addScript('inspector.freeContext()');
+-+  await Protocol.HeapProfiler.collectGarbage();
+-+  InspectorTest.completeTest();
+-+})();

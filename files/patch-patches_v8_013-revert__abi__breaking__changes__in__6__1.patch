@@ -1,0 +1,196 @@
+--- patches/v8/013-revert_abi_breaking_changes_in_6_1.patch.orig	2018-01-08 01:30:08 UTC
++++ patches/v8/013-revert_abi_breaking_changes_in_6_1.patch
+@@ -516,25 +516,6 @@ index 48f5b30bd2..8e517982ac 100644
+  
+    time_millis_at_init_ = heap_.MonotonicallyIncreasingTimeInMs();
+  
+-diff --git a/src/trap-handler/handler-inside.cc b/src/trap-handler/handler-inside.cc
+-index a51bd9427f..4a748b8175 100644
+---- a/src/trap-handler/handler-inside.cc
+-+++ b/src/trap-handler/handler-inside.cc
+-@@ -36,13 +36,13 @@ namespace trap_handler {
+- 
+- namespace {
+- 
+-+#if V8_TRAP_HANDLER_SUPPORTED
+- bool IsKernelGeneratedSignal(siginfo_t* info) {
+-   return info->si_code > 0 && info->si_code != SI_USER &&
+-          info->si_code != SI_QUEUE && info->si_code != SI_TIMER &&
+-          info->si_code != SI_ASYNCIO && info->si_code != SI_MESGQ;
+- }
+- 
+--#if V8_TRAP_HANDLER_SUPPORTED
+- class SigUnmaskStack {
+-  public:
+-   explicit SigUnmaskStack(sigset_t sigs) {
+ diff --git a/src/trap-handler/trap-handler.h b/src/trap-handler/trap-handler.h
+ index ed9459918b..73a147f0cb 100644
+ --- a/src/trap-handler/trap-handler.h
+@@ -552,167 +533,3 @@ index ed9459918b..73a147f0cb 100644
+  
+  struct ProtectedInstructionData {
+    // The offset of this instruction from the start of its code object.
+-diff --git a/test/cctest/heap/test-heap.cc b/test/cctest/heap/test-heap.cc
+-index 6781d3de6a..d9608292e8 100644
+---- a/test/cctest/heap/test-heap.cc
+-+++ b/test/cctest/heap/test-heap.cc
+-@@ -4806,7 +4806,7 @@ HEAP_TEST(Regress538257) {
+-   FLAG_manual_evacuation_candidates_selection = true;
+-   v8::Isolate::CreateParams create_params;
+-   // Set heap limits.
+--  create_params.constraints.set_max_semi_space_size_in_kb(1024);
+-+  create_params.constraints.set_max_semi_space_size(1);
+-   create_params.constraints.set_max_old_space_size(6);
+-   create_params.array_buffer_allocator = CcTest::array_buffer_allocator();
+-   v8::Isolate* isolate = v8::Isolate::New(create_params);
+-diff --git a/test/cctest/test-api.cc b/test/cctest/test-api.cc
+-index 2d64279bf8..aa4cba5a60 100644
+---- a/test/cctest/test-api.cc
+-+++ b/test/cctest/test-api.cc
+-@@ -3453,16 +3453,10 @@ class ScopedArrayBufferContents {
+-  public:
+-   explicit ScopedArrayBufferContents(const v8::ArrayBuffer::Contents& contents)
+-       : contents_(contents) {}
+--  ~ScopedArrayBufferContents() { free(contents_.AllocationBase()); }
+-+  ~ScopedArrayBufferContents() { free(contents_.Data()); }
+-   void* Data() const { return contents_.Data(); }
+-   size_t ByteLength() const { return contents_.ByteLength(); }
+- 
+--  void* AllocationBase() const { return contents_.AllocationBase(); }
+--  size_t AllocationLength() const { return contents_.AllocationLength(); }
+--  v8::ArrayBuffer::Allocator::AllocationMode AllocationMode() const {
+--    return contents_.AllocationMode();
+--  }
+--
+-  private:
+-   const v8::ArrayBuffer::Contents contents_;
+- };
+-@@ -3738,43 +3732,15 @@ THREADED_TEST(ArrayBuffer_NeuteringScript) {
+-   CheckDataViewIsNeutered(dv);
+- }
+- 
+--THREADED_TEST(ArrayBuffer_AllocationInformation) {
+--  LocalContext env;
+--  v8::Isolate* isolate = env->GetIsolate();
+--  v8::HandleScope handle_scope(isolate);
+--
+--  const size_t ab_size = 1024;
+--  Local<v8::ArrayBuffer> ab = v8::ArrayBuffer::New(isolate, ab_size);
+--  ScopedArrayBufferContents contents(ab->Externalize());
+--
+--  // Array buffers should have normal allocation mode.
+--  CHECK(contents.AllocationMode() ==
+--        v8::ArrayBuffer::Allocator::AllocationMode::kNormal);
+--  // The allocation must contain the buffer (normally they will be equal, but
+--  // this is not required by the contract).
+--  CHECK_NOT_NULL(contents.AllocationBase());
+--  const uintptr_t alloc =
+--      reinterpret_cast<uintptr_t>(contents.AllocationBase());
+--  const uintptr_t data = reinterpret_cast<uintptr_t>(contents.Data());
+--  CHECK_LE(alloc, data);
+--  CHECK_LE(data + contents.ByteLength(), alloc + contents.AllocationLength());
+--}
+--
+- class ScopedSharedArrayBufferContents {
+-  public:
+-   explicit ScopedSharedArrayBufferContents(
+-       const v8::SharedArrayBuffer::Contents& contents)
+-       : contents_(contents) {}
+--  ~ScopedSharedArrayBufferContents() { free(contents_.AllocationBase()); }
+-+  ~ScopedSharedArrayBufferContents() { free(contents_.Data()); }
+-   void* Data() const { return contents_.Data(); }
+-   size_t ByteLength() const { return contents_.ByteLength(); }
+- 
+--  void* AllocationBase() const { return contents_.AllocationBase(); }
+--  size_t AllocationLength() const { return contents_.AllocationLength(); }
+--  v8::ArrayBuffer::Allocator::AllocationMode AllocationMode() const {
+--    return contents_.AllocationMode();
+--  }
+--
+-  private:
+-   const v8::SharedArrayBuffer::Contents contents_;
+- };
+-@@ -20361,7 +20327,7 @@ class InitDefaultIsolateThread : public v8::base::Thread {
+-     create_params.array_buffer_allocator = CcTest::array_buffer_allocator();
+-     switch (testCase_) {
+-       case SetResourceConstraints: {
+--        create_params.constraints.set_max_semi_space_size_in_kb(1024);
+-+        create_params.constraints.set_max_semi_space_size(1);
+-         create_params.constraints.set_max_old_space_size(6);
+-         break;
+-       }
+-@@ -26057,29 +26023,6 @@ TEST(FutexInterruption) {
+-   timeout_thread.Join();
+- }
+- 
+--THREADED_TEST(SharedArrayBuffer_AllocationInformation) {
+--  i::FLAG_harmony_sharedarraybuffer = true;
+--  LocalContext env;
+--  v8::Isolate* isolate = env->GetIsolate();
+--  v8::HandleScope handle_scope(isolate);
+--
+--  const size_t ab_size = 1024;
+--  Local<v8::SharedArrayBuffer> ab =
+--      v8::SharedArrayBuffer::New(isolate, ab_size);
+--  ScopedSharedArrayBufferContents contents(ab->Externalize());
+--
+--  // Array buffers should have normal allocation mode.
+--  CHECK(contents.AllocationMode() ==
+--        v8::ArrayBuffer::Allocator::AllocationMode::kNormal);
+--  // The allocation must contain the buffer (normally they will be equal, but
+--  // this is not required by the contract).
+--  CHECK_NOT_NULL(contents.AllocationBase());
+--  const uintptr_t alloc =
+--      reinterpret_cast<uintptr_t>(contents.AllocationBase());
+--  const uintptr_t data = reinterpret_cast<uintptr_t>(contents.Data());
+--  CHECK_LE(alloc, data);
+--  CHECK_LE(data + contents.ByteLength(), alloc + contents.AllocationLength());
+--}
+- 
+- static int nb_uncaught_exception_callback_calls = 0;
+- 
+-diff --git a/test/cctest/test-strings.cc b/test/cctest/test-strings.cc
+-index 73e9c58596..d98a4819b5 100644
+---- a/test/cctest/test-strings.cc
+-+++ b/test/cctest/test-strings.cc
+-@@ -1301,7 +1301,7 @@ TEST(SliceFromSlice) {
+- UNINITIALIZED_TEST(OneByteArrayJoin) {
+-   v8::Isolate::CreateParams create_params;
+-   // Set heap limits.
+--  create_params.constraints.set_max_semi_space_size_in_kb(1024);
+-+  create_params.constraints.set_max_semi_space_size(1);
+-   create_params.constraints.set_max_old_space_size(7);
+-   create_params.array_buffer_allocator = CcTest::array_buffer_allocator();
+-   v8::Isolate* isolate = v8::Isolate::New(create_params);
+-diff --git a/test/unittests/heap/heap-unittest.cc b/test/unittests/heap/heap-unittest.cc
+-index 6262eff210..8dab181ca7 100644
+---- a/test/unittests/heap/heap-unittest.cc
+-+++ b/test/unittests/heap/heap-unittest.cc
+-@@ -63,14 +63,19 @@ TEST(Heap, MaxHeapGrowingFactor) {
+- }
+- 
+- TEST(Heap, SemiSpaceSize) {
+--  const size_t KB = static_cast<size_t>(i::KB);
+--  const size_t MB = static_cast<size_t>(i::MB);
+--  const size_t pm = i::Heap::kPointerMultiplier;
+--  ASSERT_EQ(1u * pm * MB / 2, i::Heap::ComputeMaxSemiSpaceSize(0u) * KB);
+--  ASSERT_EQ(1u * pm * MB / 2, i::Heap::ComputeMaxSemiSpaceSize(512u * MB) * KB);
+--  ASSERT_EQ(3u * pm * MB, i::Heap::ComputeMaxSemiSpaceSize(1024u * MB) * KB);
+--  ASSERT_EQ(8u * pm * MB, i::Heap::ComputeMaxSemiSpaceSize(2024u * MB) * KB);
+--  ASSERT_EQ(8u * pm * MB, i::Heap::ComputeMaxSemiSpaceSize(4095u * MB) * KB);
+-+  uint64_t configurations[][2] = {
+-+      {0, 1 * i::Heap::kPointerMultiplier},
+-+      {512 * i::MB, 1 * i::Heap::kPointerMultiplier},
+-+      {1 * i::GB, 3 * i::Heap::kPointerMultiplier},
+-+      {2 * static_cast<uint64_t>(i::GB), i::Heap::kMaxSemiSpaceSize},
+-+      {4 * static_cast<uint64_t>(i::GB), i::Heap::kMaxSemiSpaceSize},
+-+      {8 * static_cast<uint64_t>(i::GB), i::Heap::kMaxSemiSpaceSize}};
+-+
+-+  for (auto configuration : configurations) {
+-+    ASSERT_EQ(configuration[1],
+-+              static_cast<uint64_t>(
+-+                  i::Heap::ComputeMaxSemiSpaceSize(configuration[0])));
+-+  }
+- }
+- 
+- TEST(Heap, OldGenerationSize) {

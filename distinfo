@@ -1,6 +1,8 @@
-TIMESTAMP = 1516907720
+TIMESTAMP = 1517353452
 SHA256 (electron-libchromiumcontent-1.0-2bdad00587_GH0.tar.gz) = 7978901c2236b6fbc913d8a69f295d565800391d5899ab71ed71b92fc496ef49
 SIZE (electron-libchromiumcontent-1.0-2bdad00587_GH0.tar.gz) = 127359
+SHA256 (yzgyyang-ports-electron-depends-chromium-e9098f3_GH0.tar.gz) = 443396fc33277294721d0bc570c1e66e48360b0c5d8137523eb4f52ae5f68f52
+SIZE (yzgyyang-ports-electron-depends-chromium-e9098f3_GH0.tar.gz) = 563146
 SHA256 (piotrbulinski-boto-c3b81eb_GH0.tar.gz) = c64c0ff48c87d9a70d63a2345a04de3e3f6756324bc0578c6d423fde8370dd41
 SIZE (piotrbulinski-boto-c3b81eb_GH0.tar.gz) = 1349165
 SHA256 (yzgyyang-depot-tools-c55eecf_GH0.tar.gz) = 0e6b4f78604a0ecaac817a4c091f2272e0f9342ed72ae97ad57ced0bc572fd60

@@ -1,0 +1,30 @@
+--- script/create-dist.orig	2018-01-08 01:30:08 UTC
++++ script/create-dist
+@@ -39,7 +39,9 @@ if sys.platform == 'win32':
+   NINJA = '{0}.exe'.format(NINJA)
+ elif IS_MIPS64EL_HOST:
+   NINJA = os.path.join(VENDOR_DIR, 'depot_tools', 'ninja-build')
+-
++elif sys.platform == 'freebsd11':
++  NINJA = 'ninja'
++  
+ COPY_PY = os.path.join(TOOLS_DIR, 'copy.py')
+ LICENSES_PY = os.path.join(TOOLS_DIR, 'licenses.py')
+ 
+@@ -47,6 +49,7 @@ TARGET_PLATFORM = {
+   'cygwin': 'win32',
+   'darwin': 'darwin',
+   'linux2': 'linux',
++  'freebsd11': 'linux',
+   'win32': 'win32',
+ }[sys.platform]
+ 
+@@ -742,6 +745,8 @@ def create_zip(create_debug_archive, com
+     print 'Zipping static_library builds...'
+     p = os.path.join(SOURCE_ROOT, 'libchromiumcontent-static.zip')
+     make_zip(MAIN_DIR, ['static_library'], [], p)
++    p = os.path.join(SOURCE_ROOT, 'libchromiumcontent.zip')
++    make_zip(MAIN_DIR, ['src', 'ffmpeg'], ['LICENSES.chromium.html'], p)
+ 
+ 
+ def make_zip(src, dirs, files, target):

@@ -1,0 +1,18 @@
+--- patches/v8/010-backport_f9c4b7a.patch.orig	2018-01-08 01:30:08 UTC
++++ patches/v8/010-backport_f9c4b7a.patch
+@@ -194,15 +194,3 @@ index 5b1e26e1d0..48f5b30bd2 100644
+  
+    DumpAndResetStats();
+  
+-diff --git a/test/cctest/heap/test-spaces.cc b/test/cctest/heap/test-spaces.cc
+-index 26b2fdd193..b99913ab80 100644
+---- a/test/cctest/heap/test-spaces.cc
+-+++ b/test/cctest/heap/test-spaces.cc
+-@@ -370,6 +370,7 @@ TEST(NewSpace) {
+-   }
+- 
+-   new_space.TearDown();
+-+  memory_allocator->unmapper()->WaitUntilCompleted();
+-   memory_allocator->TearDown();
+-   delete memory_allocator;
+- }

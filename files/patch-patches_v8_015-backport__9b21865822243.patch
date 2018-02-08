@@ -1,0 +1,85 @@
+--- patches/v8/015-backport_9b21865822243.patch.orig	2018-01-08 01:30:08 UTC
++++ patches/v8/015-backport_9b21865822243.patch
+@@ -331,81 +331,4 @@ index 44ef96b064..2ea58d886b 100644
+ +  std::vector<GCCallbackTuple> gc_prologue_callbacks_;
+  
+    GetExternallyAllocatedMemoryInBytesCallback external_memory_callback_;
+- 
+-diff --git a/test/cctest/test-api.cc b/test/cctest/test-api.cc
+-index aa4cba5a60..06ce7c565e 100644
+---- a/test/cctest/test-api.cc
+-+++ b/test/cctest/test-api.cc
+-@@ -19592,6 +19592,19 @@ void EpilogueCallbackSecond(v8::Isolate* isolate,
+-   ++epilogue_call_count_second;
+- }
+- 
+-+void PrologueCallbackNew(v8::Isolate* isolate, v8::GCType,
+-+                         v8::GCCallbackFlags flags, void* data) {
+-+  CHECK_EQ(flags, v8::kNoGCCallbackFlags);
+-+  CHECK_EQ(gc_callbacks_isolate, isolate);
+-+  ++*static_cast<int*>(data);
+-+}
+-+
+-+void EpilogueCallbackNew(v8::Isolate* isolate, v8::GCType,
+-+                         v8::GCCallbackFlags flags, void* data) {
+-+  CHECK_EQ(flags, v8::kNoGCCallbackFlags);
+-+  CHECK_EQ(gc_callbacks_isolate, isolate);
+-+  ++*static_cast<int*>(data);
+-+}
+- 
+- void PrologueCallbackAlloc(v8::Isolate* isolate,
+-                            v8::GCType,
+-@@ -19666,6 +19679,52 @@ TEST(GCCallbacksOld) {
+-   CHECK_EQ(2, epilogue_call_count_second);
+- }
+- 
+-+TEST(GCCallbacksWithData) {
+-+  LocalContext context;
+-+
+-+  gc_callbacks_isolate = context->GetIsolate();
+-+  int prologue1 = 0;
+-+  int epilogue1 = 0;
+-+  int prologue2 = 0;
+-+  int epilogue2 = 0;
+-+
+-+  context->GetIsolate()->AddGCPrologueCallback(PrologueCallbackNew, &prologue1);
+-+  context->GetIsolate()->AddGCEpilogueCallback(EpilogueCallbackNew, &epilogue1);
+-+  CHECK_EQ(0, prologue1);
+-+  CHECK_EQ(0, epilogue1);
+-+  CHECK_EQ(0, prologue2);
+-+  CHECK_EQ(0, epilogue2);
+-+  CcTest::CollectAllGarbage();
+-+  CHECK_EQ(1, prologue1);
+-+  CHECK_EQ(1, epilogue1);
+-+  CHECK_EQ(0, prologue2);
+-+  CHECK_EQ(0, epilogue2);
+-+  context->GetIsolate()->AddGCPrologueCallback(PrologueCallbackNew, &prologue2);
+-+  context->GetIsolate()->AddGCEpilogueCallback(EpilogueCallbackNew, &epilogue2);
+-+  CcTest::CollectAllGarbage();
+-+  CHECK_EQ(2, prologue1);
+-+  CHECK_EQ(2, epilogue1);
+-+  CHECK_EQ(1, prologue2);
+-+  CHECK_EQ(1, epilogue2);
+-+  context->GetIsolate()->RemoveGCPrologueCallback(PrologueCallbackNew,
+-+                                                  &prologue1);
+-+  context->GetIsolate()->RemoveGCEpilogueCallback(EpilogueCallbackNew,
+-+                                                  &epilogue1);
+-+  CcTest::CollectAllGarbage();
+-+  CHECK_EQ(2, prologue1);
+-+  CHECK_EQ(2, epilogue1);
+-+  CHECK_EQ(2, prologue2);
+-+  CHECK_EQ(2, epilogue2);
+-+  context->GetIsolate()->RemoveGCPrologueCallback(PrologueCallbackNew,
+-+                                                  &prologue2);
+-+  context->GetIsolate()->RemoveGCEpilogueCallback(EpilogueCallbackNew,
+-+                                                  &epilogue2);
+-+  CcTest::CollectAllGarbage();
+-+  CHECK_EQ(2, prologue1);
+-+  CHECK_EQ(2, epilogue1);
+-+  CHECK_EQ(2, prologue2);
+-+  CHECK_EQ(2, epilogue2);
+-+}
+- 
+- TEST(GCCallbacks) {
+-   LocalContext context;
++

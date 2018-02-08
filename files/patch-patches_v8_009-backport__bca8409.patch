@@ -1,0 +1,28 @@
+--- patches/v8/009-backport_bca8409.patch.orig	2018-01-08 01:30:08 UTC
++++ patches/v8/009-backport_bca8409.patch
+@@ -136,25 +136,3 @@ index 9ea365e405..8460fa7841 100644
+      base::Semaphore pending_sweeper_tasks_semaphore_;
+      base::Mutex mutex_;
+      SweptList swept_list_[kAllocationSpaces];
+-diff --git a/test/unittests/cancelable-tasks-unittest.cc b/test/unittests/cancelable-tasks-unittest.cc
+-index eb5dd91589..d0462877f5 100644
+---- a/test/unittests/cancelable-tasks-unittest.cc
+-+++ b/test/unittests/cancelable-tasks-unittest.cc
+-@@ -180,7 +180,7 @@ TEST(CancelableTask, RemoveBeforeCancelAndWait) {
+-   ResultType result1 = 0;
+-   TestTask* task1 = new TestTask(&manager, &result1, TestTask::kCheckNotRun);
+-   ThreadedRunner runner1(task1);
+--  uint32_t id = task1->id();
+-+  CancelableTaskManager::Id id = task1->id();
+-   EXPECT_EQ(id, 1u);
+-   EXPECT_TRUE(manager.TryAbort(id));
+-   runner1.Start();
+-@@ -195,7 +195,7 @@ TEST(CancelableTask, RemoveAfterCancelAndWait) {
+-   ResultType result1 = 0;
+-   TestTask* task1 = new TestTask(&manager, &result1);
+-   ThreadedRunner runner1(task1);
+--  uint32_t id = task1->id();
+-+  CancelableTaskManager::Id id = task1->id();
+-   EXPECT_EQ(id, 1u);
+-   runner1.Start();
+-   runner1.Join();
