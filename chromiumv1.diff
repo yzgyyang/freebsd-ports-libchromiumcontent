@@ -28,7 +28,7 @@
      "NET_IMPLEMENTATION",
    ]
 - 
-+  include_dirs = [ "../third_party/icu/source/common", "../third_party/icu/source/i18n", ]
++  include_dirs = [ "../third_party/icu/source/common", "../third_party/icu/source/i18n", "../third_party/protobuf/src",]
    if (use_kerberos) {
      defines += [ "USE_KERBEROS" ]
      if (is_android) {
@@ -53,3 +53,14 @@ diff -ru a/ui/base/BUILD.gn b/ui/base/BUILD.gn
    sources = [
      "android/gfx_jni_registrar.cc",
      "android/gfx_jni_registrar.h",
+--- a/content/browser/BUILD.gn	2018-06-01 23:41:40.631763000 +0400
++++ b/content/browser/BUILD.gn	2018-06-01 23:34:46.206380000 +0400
+@@ -29,7 +29,7 @@
+   defines = []
+   libs = []
+   ldflags = []
+-
++  include_dirs = [ "../../third_party/protobuf/src"]
+   deps = [
+     "//base",
+     "//base:base_static",
